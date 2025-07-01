@@ -1,5 +1,6 @@
 package com.todoapi;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -11,17 +12,25 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/v1/todo")
 public class TodoController {
+
+    @Autowired
+    private TodoService todoService; //composition
     private static List<Todo> todoList;
 
+    //TodoController class automatically inject, pass, send the todoService class in the controller function
     public TodoController() {
+        // this.todoService = todoService;
         todoList = new ArrayList<>();
         todoList.add(new Todo(1, false, "Todo 1", 1));
         todoList.add(new Todo(2, true, "Todo 2", 2));
 
     }
 
+    // QUERY PARAM IN API : property (required = false) makes the param as not compulsory to make sure it gets called without mentioning isCompleted params
+    // QUERY PARAM IN API : property (defaultValue = "true") we can change the default value to true also
     @GetMapping
-    public ResponseEntity<List<Todo>> getTodo() {
+    public ResponseEntity<List<Todo>> getTodo(@RequestParam(required = false, defaultValue = "true") boolean isCompleted) {
+        System.out.println("Incoming query params: " + isCompleted + "\n" + this.todoService.doSomething());
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(todoList);
