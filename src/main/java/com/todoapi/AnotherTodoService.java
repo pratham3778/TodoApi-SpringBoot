@@ -3,8 +3,8 @@ package com.todoapi;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 
-@Service
-@Primary
+@Service("another")
+// @Primary
 public class AnotherTodoService implements TodoService{
 
     @Override

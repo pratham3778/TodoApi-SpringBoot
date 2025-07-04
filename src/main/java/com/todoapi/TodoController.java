@@ -1,6 +1,7 @@
 package com.todoapi;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -13,13 +14,23 @@ import java.util.List;
 @RequestMapping("/api/v1/todo")
 public class TodoController {
 
-    @Autowired
+    // field injection not recommended : you cannot keep prop final this can be reassign-able , it can make testing procedure harder
+    // @Autowired  //no need to do constructor dependency injection
+    // @Qualifier("another") //eliminate the issue of which bean need to be injected
     private TodoService todoService; //composition
+
+    // @Qualifier("fake")
+    private TodoService todoService2;
+
     private static List<Todo> todoList;
 
     //TodoController class automatically inject, pass, send the todoService class in the controller function
-    public TodoController() {
-        // this.todoService = todoService;
+    public TodoController(
+            @Qualifier("another") TodoService todoService,
+            @Qualifier("fake") TodoService todoService2
+    ) {
+        this.todoService = todoService;
+        this.todoService2 = todoService2;
         todoList = new ArrayList<>();
         todoList.add(new Todo(1, false, "Todo 1", 1));
         todoList.add(new Todo(2, true, "Todo 2", 2));
@@ -30,7 +41,7 @@ public class TodoController {
     // QUERY PARAM IN API : property (defaultValue = "true") we can change the default value to true also
     @GetMapping
     public ResponseEntity<List<Todo>> getTodo(@RequestParam(required = false, defaultValue = "true") boolean isCompleted) {
-        System.out.println("Incoming query params: " + isCompleted + "\n" + this.todoService.doSomething());
+        System.out.println("Incoming query params: " + isCompleted + "\n" + this.todoService2.doSomething()); /*+ "\n" + todoService2.doSomething()*/
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(todoList);
